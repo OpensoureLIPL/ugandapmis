@@ -1,24 +1,24 @@
 <?php
 App::uses('AppController', 'Controller');
 class CallinoutsController   extends AppController {
-	public $layout='table';
-	public function index() {
-		$this->loadModel('Callinout'); 
-		//debug($this->data['RecordStaffDelete']['id']);
-		//return false;
+    public $layout='table';
+    public function index() {
+        $this->loadModel('Callinout'); 
+        //debug($this->data['RecordStaffDelete']['id']);
+        //return false;
         if(isset($this->data['CallinoutDelete']['id']) && (int)$this->data['CallinoutDelete']['id'] != 0){
-        	
+            
                  $this->Callinout->id=$this->data['CallinoutDelete']['id'];
                  $this->Callinout->saveField('is_trash',1);
-        		 
-			     $this->Session->write('message_type','success');
-			     $this->Session->write('message','Deleted Successfully !');
-			     $this->redirect(array('action'=>'index'));
-        	
+                 
+                 $this->Session->write('message_type','success');
+                 $this->Session->write('message','Deleted Successfully !');
+                 $this->redirect(array('action'=>'index'));
+            
         }
     }
     public function indexAjax(){
-      	$this->loadModel('Callinout'); 
+        $this->loadModel('Callinout'); 
         $this->layout = 'ajax';
         $from  = '';
         $to  = '';
@@ -30,7 +30,23 @@ class CallinoutsController   extends AppController {
               $condition =array('date(Callinout.date) BETWEEN ? and ?' => array($from , $to));
             //$condition += array("RecordStaff.recorded_date BETWEEN $from and $to ");
         } 
+        if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
+            if($this->params['named']['reqType']=='XLS'){
+                $this->layout='export_xls';
+                $this->set('file_type','xls');
+                $this->set('file_name','mis_report_'.date('d_m_Y').'.xls');
+            }else if($this->params['named']['reqType']=='DOC'){
+                $this->layout='export_xls';
+                $this->set('file_type','doc');
+                $this->set('file_name','mis_report_'.date('d_m_Y').'.doc');
+            }else if($this->params['named']['reqType']=='PDF'){
 
+            }
+            $this->set('is_excel','Y');         
+            $limit = array('limit' => 2000,'maxLimit'   => 2000);
+        }else{
+            $limit = array('limit'  => 20);
+        }    
         $this->paginate = array(
             'conditions'    => $condition,
             'order'         =>array(
@@ -48,18 +64,18 @@ class CallinoutsController   extends AppController {
         )); 
 
     }
-	public function add() { 
-		$this->loadModel('Callinout');
-		
-		 //debug($staffcategory_id);
-		if (isset($this->data['Callinout']) && is_array($this->data['Callinout']) && count($this->data['Callinout'])>0){			
-			if ($this->Callinout->save($this->data)) {
-				$this->Flash->success(__('The calls received or outgoing record has been saved.'));
-				return $this->redirect(array('action' => 'index'));
-			} else {
-				$this->Flash->error(__('The calls received or outgoing record could not be saved. Please, try again.'));
-			}
-		}
+    public function add() { 
+        $this->loadModel('Callinout');
+        
+         //debug($staffcategory_id);
+        if (isset($this->data['Callinout']) && is_array($this->data['Callinout']) && count($this->data['Callinout'])>0){            
+            if ($this->Callinout->save($this->data)) {
+                $this->Flash->success(__('The calls received or outgoing record has been saved.'));
+                return $this->redirect(array('action' => 'index'));
+            } else {
+                $this->Flash->error(__('The calls received or outgoing record could not be saved. Please, try again.'));
+            }
+        }
         if(isset($this->data['CallinoutEdit']['id']) && (int)$this->data['CallinoutEdit']['id'] != 0){
             if($this->Callinout->exists($this->data['CallinoutEdit']['id'])){
                 $this->data = $this->Callinout->findById($this->data['CallinoutEdit']['id']);
@@ -83,5 +99,5 @@ class CallinoutsController   extends AppController {
         $this->set(array(
             'prisonerList'    => $prisonerList
         ));
-	}
+    }
 }

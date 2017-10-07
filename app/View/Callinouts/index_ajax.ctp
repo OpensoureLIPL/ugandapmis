@@ -1,5 +1,6 @@
 <?php
 if(is_array($datas) && count($datas)>0){
+  if(!isset($is_excel)){
 ?>
 <div class="row">
     <div class="col-sm-5">
@@ -30,8 +31,19 @@ echo $this->Paginator->counter(array(
     'format' => __('Page {:page} of {:pages}, showing {:current} records out of {:count} total, starting on record {:start}, ending on {:end}')
 ));
 ?>
+<?php
+    $exUrl = "indexAjax/from:$from/to:$to";
+    $urlExcel = $exUrl.'/reqType:XLS';
+    $urlDoc = $exUrl.'/reqType:DOC';
+    echo($this->Html->link($this->Html->image("excel-2012.jpg",array("height" => "20","width" => "20","title"=>"Download Excel")),$urlExcel, array("escape" => false)));
+    echo '&nbsp;&nbsp;';
+    echo($this->Html->link($this->Html->image("word-2012.png",array("height" => "20","width" => "20","title"=>"Download Doc")),$urlDoc, array("escape" => false)));
+?>
     </div>
 </div>
+<?php
+    }
+?>
 <table id="districtTable" class="table table-bordered table-striped">
   <thead>
     <tr>
@@ -44,9 +56,14 @@ echo $this->Paginator->counter(array(
       <th><?php echo $this->Paginator->sort('Phone_no'); ?></th>
       <th><?php echo $this->Paginator->sort('Delivered By'); ?></th>
       <th><?php echo $this->Paginator->sort('Duration'); ?></th>
-      
+      <?php
+      if(!isset($is_excel)){
+      ?> 
       <th><?php echo __('Edit'); ?></th>
       <th><?php echo __('Delete'); ?></th>
+      <?php
+        }
+        ?> 
     </tr>
   </thead>
 <tbody>
@@ -65,8 +82,10 @@ foreach($datas as $data){
       <td><?php echo ucwords(h($data['Callinout']['phone_no'])); ?>&nbsp;</td>
       <td><?php echo ucwords(h($data['Callinout']['delivered_by'])); ?>&nbsp;</td>
       <td><?php echo ucwords(h($data['Callinout']['duration'])); ?>&nbsp;</td>
-         				
-      
+                
+      <?php
+        if(!isset($is_excel)){
+?> 
         <td class="actions">
           <?php echo $this->Form->create('CallinoutEdit',array('url'=>'/callinouts/add','admin'=>false));?> 
           <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['Callinout']['id'])); ?>
@@ -77,6 +96,9 @@ foreach($datas as $data){
             <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['Callinout']['id'])); ?>
             <?php echo $this->Form->end(array('label'=>'Delete','class'=>'btn btn-danger btn-mini','div'=>false, 'onclick'=>"javascript:return confirm('Are you sure want to delete?')")); ?>
       </td>
+       <?php
+        }
+          ?>
     </tr>
 <?php
 $rowCnt++;
